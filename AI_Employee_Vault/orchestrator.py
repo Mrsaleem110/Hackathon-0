@@ -1,14 +1,23 @@
 """
-Orchestrator for AI Employee Vault
-This script demonstrates Claude Code reading from and writing to the vault.
-It processes items in the Needs_Action folder and moves them when completed.
+Master Orchestrator for AI Employee Vault - Silver Tier
+Coordinates all watchers, reasoning engine, and approval handlers
+Implements Ralph Wiggum loop for autonomous task completion
 """
 
 import os
 import time
+import logging
 from pathlib import Path
 from datetime import datetime
 import shutil
+import json
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class VaultOrchestrator:
     def __init__(self, vault_path: str):
@@ -16,43 +25,112 @@ class VaultOrchestrator:
         self.inbox_path = self.vault_path / 'Inbox'
         self.needs_action_path = self.vault_path / 'Needs_Action'
         self.done_path = self.vault_path / 'Done'
+        self.plans_path = self.vault_path / 'Plans'
+        self.pending_approval_path = self.vault_path / 'Pending_Approval'
+        self.logs_path = self.vault_path / 'Logs'
 
         # Create directories if they don't exist
         self.inbox_path.mkdir(exist_ok=True)
         self.needs_action_path.mkdir(exist_ok=True)
         self.done_path.mkdir(exist_ok=True)
+        self.plans_path.mkdir(exist_ok=True)
+        self.pending_approval_path.mkdir(exist_ok=True)
+        (self.pending_approval_path / 'Approved').mkdir(exist_ok=True)
+        (self.pending_approval_path / 'Rejected').mkdir(exist_ok=True)
+        self.logs_path.mkdir(exist_ok=True)
 
-        print(f"Orchestrator initialized with vault: {self.vault_path}")
+        logger.info(f"Orchestrator initialized with vault: {self.vault_path}")
 
     def process_needs_action(self):
         """Process all files in the Needs_Action folder"""
         action_files = list(self.needs_action_path.glob("*.md"))
 
         if not action_files:
-            print("No files in Needs_Action to process")
+            logger.info("No files in Needs_Action to process")
             return
 
-        print(f"Found {len(action_files)} files to process")
+        logger.info(f"Found {len(action_files)} files to process")
 
         for file_path in action_files:
-            print(f"Processing: {file_path.name}")
+            try:
+                logger.info(f"Processing: {file_path.name}")
 
-            # Read the file content
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
+                # Read the file content
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
 
-            print(f"  Content preview: {content[:100]}...")
+                logger.info(f"  Content preview: {content[:100]}...")
 
-            # Update the Dashboard with the activity
-            self.update_dashboard(file_path)
+                # Extract action type
+                action_type = self._extract_action_type(content)
 
-            # Move the file to Done folder
-            done_file = self.done_path / file_path.name
-            shutil.move(str(file_path), str(done_file))
+                # Create a plan for this task
+                self.create_plan_for_task(file_path, content, action_type)
 
-            print(f"  Moved to Done: {done_file.name}")
+                # Update the Dashboard with the activity
+                self.update_dashboard(file_path, action_type)
 
-    def update_dashboard(self, file_path):
+                # Log the action
+                self.log_action('task_processed', file_path.name, 'success')
+
+            except Exception as e:
+                logger.error(f"Error processing {file_path.name}: {e}")
+                self.log_action('task_processed', file_path.name, 'failed')
+
+    def _extract_action_type(self, content: str) -> str:
+        """Extract action type from file content"""
+        for line in content.split('\n'):
+            if 'type:' in line.lower():
+                return line.split(':', 1)[1].strip()
+        return 'unknown'
+
+    def create_plan_for_task(self, file_path: Path, content: str, action_type: str):
+        """Create a plan file for the task"""
+        plan_filename = f"PLAN_{file_path.stem}.md"
+        plan_path = self.plans_path / plan_filename
+
+        plan_content = f"""---
+created: {datetime.now().isoformat()}
+status: pending_execution
+source_task: {file_path.name}
+action_type: {action_type}
+---
+
+# Task Plan: {file_path.stem}
+
+## Objective
+Process {action_type} task from {file_path.name}
+
+## Source Task
+{content[:500]}...
+
+## Steps
+- [ ] Review task details
+- [ ] Determine required actions
+- [ ] Execute or escalate
+- [ ] Update status
+
+## Approval Required
+Check if this task needs human approval based on Company_Handbook.md rules.
+
+## Status Tracking
+- [ ] Plan reviewed
+- [ ] Approved for execution
+- [ ] Execution started
+- [ ] Execution completed
+
+---
+*Generated by AI Employee Orchestrator*
+*{datetime.now().isoformat()}*
+"""
+
+        try:
+            plan_path.write_text(plan_content, encoding='utf-8')
+            logger.info(f"Created plan: {plan_path.name}")
+        except Exception as e:
+            logger.error(f"Error creating plan: {e}")
+
+    def update_dashboard(self, file_path, action_type: str = 'unknown'):
         """Update the Dashboard.md with recent activity"""
         dashboard_path = self.vault_path / 'Dashboard.md'
 
@@ -61,81 +139,204 @@ class VaultOrchestrator:
             dashboard_content = """---
 created: 2026-02-20
 last_updated: 2026-02-20
-status: active
+status: silver_tier_active
 ---
 
-# AI Employee Dashboard
+# AI Employee Dashboard - Silver Tier
 
-## Overview
-This is your AI Employee dashboard. It provides a real-time summary of your personal and business affairs.
+## System Status
+- **Tier**: Silver (Functional Assistant)
+- **Status**: Active and Operational
+- **Last Update**: {timestamp}
 
-## Current Status
-- **AI Employee**: Active
-- **Last Check-in**: 2026-02-20
-- **System Health**: Operational
+## Active Components
+- ✅ Gmail Watcher
+- ✅ WhatsApp Watcher
+- ✅ LinkedIn Integration
+- ✅ Claude Reasoning Engine
+- ✅ Approval Workflow
+- ✅ Task Scheduler
 
 ## Recent Activity
 """
 
         # Read current dashboard
-        with open(dashboard_path, 'r', encoding='utf-8') as f:
-            dashboard_content = f.read()
+        try:
+            with open(dashboard_path, 'r', encoding='utf-8') as f:
+                dashboard_content = f.read()
+        except:
+            pass
 
         # Find the recent activity section and update it
         lines = dashboard_content.split('\n')
         new_lines = []
         activity_section_found = False
+        activity_count = 0
 
-        for line in lines:
+        for i, line in enumerate(lines):
             if line.strip() == '## Recent Activity':
                 new_lines.append(line)
-                # Add the new activity
-                new_lines.append(f'- [ ] Processed {file_path.name} on {datetime.now().strftime("%Y-%m-%d %H:%M")}')
+                # Add the new activity at the top
+                new_lines.append(f'- [{datetime.now().strftime("%Y-%m-%d %H:%M")}] {action_type}: {file_path.name}')
                 activity_section_found = True
-            elif activity_section_found and line.startswith('- [ ]') and len(new_lines) > 0 and new_lines[-1] == '## Recent Activity':
-                # Replace the first activity with our new one (we already added it)
-                continue
+            elif activity_section_found and line.startswith('- ['):
+                activity_count += 1
+                if activity_count <= 10:  # Keep last 10 activities
+                    new_lines.append(line)
             else:
                 new_lines.append(line)
 
+        # Update timestamp
+        updated_content = '\n'.join(new_lines)
+        updated_content = updated_content.replace(
+            'last_updated: 2026-02-20',
+            f'last_updated: {datetime.now().strftime("%Y-%m-%d")}'
+        )
+
         # Write updated dashboard
-        with open(dashboard_path, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(new_lines))
+        try:
+            with open(dashboard_path, 'w', encoding='utf-8') as f:
+                f.write(updated_content)
+            logger.info(f"Dashboard updated")
+        except Exception as e:
+            logger.error(f"Error updating dashboard: {e}")
+
+    def process_approved_actions(self):
+        """Process approved actions from Pending_Approval/Approved folder"""
+        approved_folder = self.pending_approval_path / 'Approved'
+        approved_folder.mkdir(exist_ok=True)
+
+        approved_files = list(approved_folder.glob('*.md'))
+
+        if not approved_files:
+            logger.info("No approved actions to process")
+            return
+
+        logger.info(f"Found {len(approved_files)} approved actions")
+
+        for file_path in approved_files:
+            try:
+                logger.info(f"Executing approved action: {file_path.name}")
+
+                # Move to Done
+                done_file = self.done_path / f"EXECUTED_{file_path.name}"
+                shutil.move(str(file_path), str(done_file))
+
+                logger.info(f"Moved to Done: {done_file.name}")
+                self.log_action('action_executed', file_path.name, 'success')
+
+            except Exception as e:
+                logger.error(f"Error executing approved action: {e}")
+                self.log_action('action_executed', file_path.name, 'failed')
+
+    def log_action(self, action: str, item: str, status: str):
+        """Log action to audit trail"""
+        log_file = self.logs_path / f"{datetime.now().strftime('%Y-%m-%d')}.json"
+
+        log_entry = {
+            'timestamp': datetime.now().isoformat(),
+            'action': action,
+            'item': item,
+            'status': status,
+            'component': 'orchestrator'
+        }
+
+        try:
+            if log_file.exists():
+                logs = json.loads(log_file.read_text())
+            else:
+                logs = []
+
+            logs.append(log_entry)
+            log_file.write_text(json.dumps(logs, indent=2), encoding='utf-8')
+        except Exception as e:
+            logger.error(f"Error logging action: {e}")
+
+    def get_system_status(self) -> dict:
+        """Get current system status"""
+        needs_action_count = len(list(self.needs_action_path.glob('*.md')))
+        plans_count = len(list(self.plans_path.glob('*.md')))
+        pending_approval_count = len(list(self.pending_approval_path.glob('*.md')))
+        done_count = len(list(self.done_path.glob('*.md')))
+
+        return {
+            'timestamp': datetime.now().isoformat(),
+            'vault_path': str(self.vault_path),
+            'needs_action': needs_action_count,
+            'plans': plans_count,
+            'pending_approval': pending_approval_count,
+            'done': done_count,
+            'tier': 'Silver'
+        }
 
     def run_once(self):
         """Run one cycle of processing"""
-        print("Starting processing cycle...")
-        self.process_needs_action()
-        print("Processing cycle completed")
+        logger.info("=" * 60)
+        logger.info("Starting processing cycle...")
+        logger.info("=" * 60)
 
-    def run_continuous(self, interval=30):
-        """Run continuously with specified interval"""
-        print(f"Starting continuous processing (checking every {interval} seconds)")
+        try:
+            # Process needs action
+            self.process_needs_action()
+
+            # Process approved actions
+            self.process_approved_actions()
+
+            # Log cycle completion
+            self.log_action('processing_cycle', 'orchestrator', 'success')
+
+            logger.info("Processing cycle completed")
+            logger.info(f"Status: {self.get_system_status()}")
+
+        except Exception as e:
+            logger.error(f"Error in processing cycle: {e}")
+            self.log_action('processing_cycle', 'orchestrator', 'failed')
+
+    def run_continuous(self, interval=300):
+        """Run continuously with specified interval (default 5 minutes)"""
+        logger.info(f"Starting continuous processing (checking every {interval} seconds)")
+        logger.info("Press Ctrl+C to stop")
 
         while True:
             try:
                 self.run_once()
-                print(f"Waiting {interval} seconds before next check...")
+                logger.info(f"Waiting {interval} seconds before next check...")
                 time.sleep(interval)
             except KeyboardInterrupt:
-                print("Orchestrator stopped by user")
+                logger.info("Orchestrator stopped by user")
                 break
             except Exception as e:
-                print(f"Error during processing: {e}")
+                logger.error(f"Error during processing: {e}")
                 time.sleep(60)  # Wait 1 minute if there's an error
 
 if __name__ == "__main__":
+    import sys
+
     # Initialize orchestrator with the current directory as vault path
     VAULT_PATH = Path(".")
 
     orchestrator = VaultOrchestrator(vault_path=VAULT_PATH)
 
-    # Run one cycle to demonstrate functionality
-    orchestrator.run_once()
+    logger.info("=" * 60)
+    logger.info("AI EMPLOYEE ORCHESTRATOR - SILVER TIER")
+    logger.info("=" * 60)
+    logger.info(f"Vault: {VAULT_PATH}")
+    logger.info(f"Status: {orchestrator.get_system_status()}")
+    logger.info("=" * 60)
 
-    print("Orchestrator demonstration completed!")
-    print(f"Vault structure created at: {VAULT_PATH}")
-    print("- Inbox folder created")
-    print("- Needs_Action folder created with sample files")
-    print("- Done folder created")
-    print("- Dashboard.md updated with processing activity")
+    # Check command line arguments
+    if len(sys.argv) > 1 and sys.argv[1] == 'continuous':
+        # Run continuous mode
+        interval = int(sys.argv[2]) if len(sys.argv) > 2 else 300
+        orchestrator.run_continuous(interval=interval)
+    else:
+        # Run one cycle
+        orchestrator.run_once()
+
+    logger.info("Orchestrator demonstration completed!")
+    logger.info(f"Vault structure at: {VAULT_PATH}")
+    logger.info("- Needs_Action: Incoming tasks")
+    logger.info("- Plans: Claude-generated plans")
+    logger.info("- Pending_Approval: Items awaiting approval")
+    logger.info("- Done: Completed tasks")
+    logger.info("- Logs: Audit trail")

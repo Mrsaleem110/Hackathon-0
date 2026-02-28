@@ -19,6 +19,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Import action executor
+try:
+    from action_executor import ActionExecutor
+    ACTION_EXECUTOR_AVAILABLE = True
+except ImportError:
+    ACTION_EXECUTOR_AVAILABLE = False
+    logger.warning("Action Executor not available")
+
 class VaultOrchestrator:
     def __init__(self, vault_path: str):
         self.vault_path = Path(vault_path)
@@ -279,8 +287,16 @@ status: silver_tier_active
             # Process needs action
             self.process_needs_action()
 
-            # Process approved actions
-            self.process_approved_actions()
+            # Execute approved actions
+            if ACTION_EXECUTOR_AVAILABLE:
+                try:
+                    executor = ActionExecutor(vault_path=str(self.vault_path))
+                    executor.execute_approved_actions()
+                except Exception as e:
+                    logger.error(f"Error executing actions: {e}")
+            else:
+                # Fallback: just move approved actions to done
+                self.process_approved_actions()
 
             # Log cycle completion
             self.log_action('processing_cycle', 'orchestrator', 'success')

@@ -98,31 +98,31 @@ def print_config_status():
     print("AI EMPLOYEE VAULT - CONFIGURATION STATUS")
     print("=" * 60)
 
-    print("\n📧 Gmail Configuration:")
-    print(f"  {'✅' if status['gmail_configured'] else '❌'} Gmail API configured")
+    print("\n[GMAIL] Gmail Configuration:")
+    print(f"  [OK] Gmail API configured" if status['gmail_configured'] else "  [NO] Gmail API not configured")
 
-    print("\n🔗 LinkedIn Configuration:")
-    print(f"  {'✅' if status['linkedin_configured'] else '❌'} LinkedIn API configured")
+    print("\n[LINKEDIN] LinkedIn Configuration:")
+    print(f"  [OK] LinkedIn API configured" if status['linkedin_configured'] else "  [NO] LinkedIn API not configured")
 
-    print("\n💬 WhatsApp Configuration:")
-    print(f"  {'✅' if status['whatsapp_session'] else '❌'} WhatsApp session found")
+    print("\n[WHATSAPP] WhatsApp Configuration:")
+    print(f"  [OK] WhatsApp session found" if status['whatsapp_session'] else "  [NO] WhatsApp session not found")
 
-    print("\n📱 LinkedIn Session:")
-    print(f"  {'✅' if status['linkedin_session'] else '❌'} LinkedIn session found")
+    print("\n[SESSION] LinkedIn Session:")
+    print(f"  [OK] LinkedIn session found" if status['linkedin_session'] else "  [NO] LinkedIn session not found")
 
-    print("\n⚙️  System Settings:")
-    print(f"  Dry Run: {'🔒 ON (no real actions)' if status['dry_run'] else '✅ OFF (real actions)'}")
-    print(f"  Demo Mode: {'🎮 ON' if status['demo_mode'] else '✅ OFF'}")
-    print(f"  Scheduler: {'✅ Enabled' if status['scheduler_enabled'] else '❌ Disabled'}")
+    print("\n[SYSTEM] System Settings:")
+    print(f"  Dry Run: {'ON (no real actions)' if status['dry_run'] else 'OFF (real actions)'}")
+    print(f"  Demo Mode: {'ON' if status['demo_mode'] else 'OFF'}")
+    print(f"  Scheduler: {'Enabled' if status['scheduler_enabled'] else 'Disabled'}")
     print(f"  Vault Path: {status['vault_path']}")
 
     print("\n" + "=" * 60)
 
     if not (status['gmail_configured'] and status['linkedin_configured']):
-        print("\n⚠️  MISSING CREDENTIALS!")
+        print("\n[WARNING] MISSING CREDENTIALS!")
         print("See CREDENTIALS_SETUP.md for setup instructions")
     else:
-        print("\n✅ All credentials configured!")
+        print("\n[SUCCESS] All credentials configured!")
 
     print("=" * 60 + "\n")
 

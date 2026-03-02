@@ -45,22 +45,48 @@ def login_linkedin():
             print("-"*60 + "\n")
 
             # Wait for user to login
-            print("Waiting for login... (this may take 1-2 minutes)")
+            print("Waiting for login... (this may take 2-3 minutes)")
+            print("Keep the browser window open and complete login manually.\n")
 
-            # Wait for feed to appear (indicates successful login)
-            try:
-                page.wait_for_selector('[data-testid="feed"]', timeout=120000)
-                print("\nSuccess! LinkedIn logged in!")
+            # Try multiple selectors to detect successful login
+            login_success = False
+            selectors = [
+                '[data-testid="feed"]',  # Feed page
+                '[data-testid="global-nav"]',  # Navigation bar
+                'a[href*="/feed/"]',  # Feed link
+                '.global-nav',  # Global navigation
+            ]
+
+            for attempt in range(6):  # Try for up to 3 minutes (6 x 30 seconds)
+                try:
+                    for selector in selectors:
+                        try:
+                            page.wait_for_selector(selector, timeout=5000)
+                            print(f"✓ Login detected! Found: {selector}")
+                            login_success = True
+                            break
+                        except:
+                            pass
+
+                    if login_success:
+                        break
+
+                    print(f"Waiting... ({(attempt+1)*30} seconds elapsed)")
+                    time.sleep(30)
+
+                except Exception as e:
+                    print(f"Check attempt {attempt+1}: {str(e)[:50]}")
+                    time.sleep(5)
+
+            if login_success:
+                print("\n✓ Success! LinkedIn logged in!")
                 print("Session saved to: .linkedin_session/")
-
-                # Keep browser open for a few seconds to ensure session is saved
                 time.sleep(3)
-
-            except Exception as e:
-                print(f"\nTimeout waiting for login. Error: {e}")
-                print("Make sure you entered your credentials correctly.")
-                print("If you have 2FA enabled, complete the verification.")
-                return False
+            else:
+                print("\n⚠ Login detection timeout.")
+                print("If you're logged in, the session may still be saved.")
+                print("Press Enter to continue...")
+                input()
 
             browser.close()
 

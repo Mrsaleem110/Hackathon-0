@@ -60,7 +60,7 @@ class ReasoningEngine:
         if gemini_key and GEMINI_AVAILABLE:
             genai.configure(api_key=gemini_key)
             self.provider = 'gemini'
-            self.model = 'gemini-pro'
+            self.model = 'gemini-2.5-flash'
             self.logger.info("✓ Google Gemini API client initialized successfully")
         # Fall back to Claude API
         elif ANTHROPIC_AVAILABLE:

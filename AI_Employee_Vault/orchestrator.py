@@ -11,6 +11,10 @@ from pathlib import Path
 from datetime import datetime
 import shutil
 import json
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(

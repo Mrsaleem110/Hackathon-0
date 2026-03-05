@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "email": {
+      "command": "python",
+      "args": ["MCP/email_mcp_server.py"],
+      "env": {
+        "VAULT_PATH": ".",
+        "LOG_LEVEL": "INFO"
+      }
+    },
+    "vault": {
+      "command": "python",
+      "args": ["MCP/vault_mcp_server.py"],
+      "env": {
+        "VAULT_PATH": ".",
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import time
 import logging
 from pathlib import Path
 from datetime import datetime
-from base_watcher import BaseWatcher
+from .base_watcher import BaseWatcher
 
 try:
     from playwright.sync_api import sync_playwright
@@ -51,8 +51,8 @@ class WhatsAppWatcher(BaseWatcher):
                 page = browser.pages[0] if browser.pages else browser.new_page()
 
                 try:
-                    page.goto('https://web.whatsapp.com', timeout=10000)
-                    page.wait_for_selector('[data-testid="chat-list"]', timeout=5000)
+                    page.goto('https://web.whatsapp.com', timeout=30000)
+                    page.wait_for_selector('[data-testid="chat-list"]', timeout=20000)
 
                     # Get all chat items
                     chat_items = page.query_selector_all('[data-testid="chat-list-item"]')

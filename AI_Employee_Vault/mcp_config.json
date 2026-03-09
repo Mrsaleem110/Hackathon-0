@@ -15,6 +15,14 @@
         "VAULT_PATH": ".",
         "LOG_LEVEL": "INFO"
       }
+    },
+    "whatsapp": {
+      "command": "python",
+      "args": ["whatsapp_mcp_server.py"],
+      "env": {
+        "VAULT_PATH": ".",
+        "LOG_LEVEL": "INFO"
+      }
     }
   }
 }

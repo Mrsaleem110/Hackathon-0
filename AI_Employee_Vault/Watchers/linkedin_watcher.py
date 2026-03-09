@@ -8,7 +8,7 @@ import time
 import logging
 from pathlib import Path
 from datetime import datetime
-from base_watcher import BaseWatcher
+from .base_watcher import BaseWatcher
 
 try:
     from playwright.sync_api import sync_playwright

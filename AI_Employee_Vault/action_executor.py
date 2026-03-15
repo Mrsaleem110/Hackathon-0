@@ -24,18 +24,14 @@ except ImportError:
     logger.warning("Email MCP Server not available")
 
 try:
-    from Watchers.linkedin_poster import LinkedInPoster
-    LINKEDIN_AVAILABLE = True
-except ImportError:
-    LINKEDIN_AVAILABLE = False
-    logger.warning("LinkedIn Poster not available")
-
-try:
     from playwright.sync_api import sync_playwright
     PLAYWRIGHT_AVAILABLE = True
 except ImportError:
     PLAYWRIGHT_AVAILABLE = False
     logger.warning("Playwright not available")
+
+# LinkedIn uses Playwright
+LINKEDIN_AVAILABLE = PLAYWRIGHT_AVAILABLE
 
 
 class ActionExecutor:
@@ -59,10 +55,8 @@ class ActionExecutor:
         else:
             self.email_server = None
 
-        if LINKEDIN_AVAILABLE:
-            self.linkedin_poster = LinkedInPoster(vault_path=str(self.vault_path))
-        else:
-            self.linkedin_poster = None
+        # LinkedIn will use Playwright directly
+        self.linkedin_available = LINKEDIN_AVAILABLE
 
         logger.info("Action Executor initialized")
 
@@ -89,6 +83,8 @@ class ActionExecutor:
                     self._execute_linkedin_post(file_path, content)
                 elif action_type == 'whatsapp_reply':
                     self._execute_whatsapp_reply(file_path, content)
+                elif action_type == 'instagram_post':
+                    self._execute_instagram_post(file_path, content)
                 else:
                     logger.warning(f"Unknown action type: {action_type}")
                     self._move_to_done(file_path, 'UNKNOWN_')
@@ -131,8 +127,8 @@ class ActionExecutor:
 
     def _execute_linkedin_post(self, file_path: Path, content: str):
         """Execute LinkedIn post action"""
-        if not self.linkedin_poster:
-            logger.warning("LinkedIn poster not available - moving to done without posting")
+        if not self.linkedin_available:
+            logger.warning("LinkedIn not available - moving to done without posting")
             self._move_to_done(file_path, 'DEMO_')
             return
 
@@ -146,9 +142,9 @@ class ActionExecutor:
                 self._move_to_done(file_path, 'FAILED_')
                 return
 
-            # Post to LinkedIn
+            # Post to LinkedIn using Playwright
             full_content = f"{title}\n\n{post_content}" if title else post_content
-            success = self.linkedin_poster.post_to_linkedin(full_content)
+            success = self._post_to_linkedin(full_content)
 
             if success:
                 logger.info("LinkedIn post published successfully")
@@ -192,6 +188,105 @@ class ActionExecutor:
         except Exception as e:
             logger.error(f"Error executing WhatsApp reply: {e}")
             self._move_to_done(file_path, 'ERROR_')
+
+    def _execute_instagram_post(self, file_path: Path, content: str):
+        """Execute Instagram post action"""
+        try:
+            # Import Instagram poster
+            try:
+                from instagram_api_poster import post_to_instagram
+            except ImportError:
+                logger.warning("Instagram API poster not available - moving to done without posting")
+                self._move_to_done(file_path, 'DEMO_')
+                return
+
+            # Extract post details
+            caption = self._extract_field(content, 'caption:')
+            image_url = self._extract_field(content, 'image_url:')
+
+            if not caption:
+                caption = self._extract_body(content)
+
+            if not caption:
+                logger.error("Missing Instagram caption")
+                self._move_to_done(file_path, 'FAILED_')
+                return
+
+            # Post to Instagram
+            success = post_to_instagram(caption, image_url if image_url else None)
+
+            if success:
+                logger.info("Instagram post published successfully")
+                self._move_to_done(file_path, 'EXECUTED_')
+            else:
+                logger.warning("Instagram post failed - moving to done")
+                self._move_to_done(file_path, 'FAILED_')
+
+        except Exception as e:
+            logger.error(f"Error executing Instagram post: {e}")
+            self._move_to_done(file_path, 'ERROR_')
+
+    def _post_to_linkedin(self, post_content: str) -> bool:
+        """Post content to LinkedIn using Playwright"""
+        try:
+            session_path = self.vault_path / '.linkedin_session'
+
+            with sync_playwright() as p:
+                browser = p.chromium.launch_persistent_context(
+                    str(session_path),
+                    headless=True,
+                    viewport={'width': 1280, 'height': 720}
+                )
+
+                page = browser.pages[0] if browser.pages else browser.new_page()
+
+                try:
+                    page.goto('https://www.linkedin.com/feed/', timeout=15000)
+
+                    # Wait for page to load
+                    page.wait_for_timeout(2000)
+
+                    # Click on "Start a post" button
+                    start_post = page.query_selector('button[aria-label*="Start a post"]')
+                    if not start_post:
+                        start_post = page.query_selector('.share-box-feed-entry__trigger')
+
+                    if start_post:
+                        start_post.click()
+                        page.wait_for_timeout(2000)
+
+                        # Find the editor
+                        editor = page.query_selector('.ql-editor')
+                        if not editor:
+                            editor = page.query_selector('[contenteditable="true"]')
+
+                        if editor:
+                            editor.fill(post_content)
+                            page.wait_for_timeout(1000)
+
+                            # Click Post button
+                            post_button = page.query_selector('button[aria-label*="Post"]')
+                            if not post_button:
+                                post_button = page.query_selector('.share-actions__primary-action')
+
+                            if post_button:
+                                post_button.click()
+                                page.wait_for_timeout(3000)
+                                logger.info("LinkedIn post published successfully")
+                                return True
+
+                    logger.error("Could not find LinkedIn post elements")
+                    return False
+
+                except Exception as e:
+                    logger.error(f"Error posting to LinkedIn: {e}")
+                    return False
+                finally:
+                    browser.close()
+
+        except Exception as e:
+            logger.error(f"Error in LinkedIn post: {e}")
+            return False
 
     def _send_whatsapp_message(self, chat_name: str, message: str, session_path: str) -> bool:
         """Send message via WhatsApp Web"""
@@ -247,7 +342,7 @@ class ActionExecutor:
     def _extract_action_type(self, content: str) -> str:
         """Extract action type from file content"""
         for line in content.split('\n'):
-            if 'action_type:' in line.lower():
+            if 'type:' in line.lower() or 'action_type:' in line.lower():
                 value = line.split(':', 1)[1].strip().lower()
                 # Handle different action type formats
                 if 'email' in value:
@@ -256,6 +351,8 @@ class ActionExecutor:
                     return 'linkedin_post'
                 elif 'whatsapp' in value:
                     return 'whatsapp_reply'
+                elif 'instagram' in value:
+                    return 'instagram_post'
                 return value
         return 'unknown'
 

@@ -33,6 +33,14 @@ LINKEDIN_CLIENT_ID = os.getenv('LINKEDIN_CLIENT_ID')
 LINKEDIN_CLIENT_SECRET = os.getenv('LINKEDIN_CLIENT_SECRET')
 LINKEDIN_ACCESS_TOKEN = os.getenv('LINKEDIN_ACCESS_TOKEN')
 
+# Instagram Configuration
+INSTAGRAM_ACCESS_TOKEN = os.getenv('INSTAGRAM_ACCESS_TOKEN')
+INSTAGRAM_BUSINESS_ACCOUNT_ID = os.getenv('INSTAGRAM_BUSINESS_ACCOUNT_ID')
+
+# Facebook Configuration
+FACEBOOK_ACCESS_TOKEN = os.getenv('FACEBOOK_ACCESS_TOKEN')
+FACEBOOK_PAGE_ID = os.getenv('FACEBOOK_PAGE_ID')
+
 # Session Paths
 WHATSAPP_SESSION_PATH = os.getenv('WHATSAPP_SESSION_PATH', '.whatsapp_session')
 LINKEDIN_SESSION_PATH = os.getenv('LINKEDIN_SESSION_PATH', '.linkedin_session')
@@ -61,6 +69,10 @@ def validate_credentials():
         'GMAIL_CLIENT_SECRET': GMAIL_CLIENT_SECRET,
         'LINKEDIN_CLIENT_ID': LINKEDIN_CLIENT_ID,
         'LINKEDIN_CLIENT_SECRET': LINKEDIN_CLIENT_SECRET,
+        'INSTAGRAM_ACCESS_TOKEN': INSTAGRAM_ACCESS_TOKEN,
+        'INSTAGRAM_BUSINESS_ACCOUNT_ID': INSTAGRAM_BUSINESS_ACCOUNT_ID,
+        'FACEBOOK_ACCESS_TOKEN': FACEBOOK_ACCESS_TOKEN,
+        'FACEBOOK_PAGE_ID': FACEBOOK_PAGE_ID,
     }
 
     missing = [key for key, value in required.items() if not value]
@@ -68,7 +80,7 @@ def validate_credentials():
     if missing:
         logger.warning(f"⚠️  Missing credentials: {', '.join(missing)}")
         logger.warning("Please set up .env file with real credentials")
-        logger.warning("See CREDENTIALS_SETUP.md for instructions")
+        logger.warning("See INSTAGRAM_FACEBOOK_SETUP.md for instructions")
         return False
 
     logger.info("✅ All credentials configured")
@@ -80,6 +92,8 @@ def get_config_status():
     status = {
         'gmail_configured': bool(GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET),
         'linkedin_configured': bool(LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET),
+        'instagram_configured': bool(INSTAGRAM_ACCESS_TOKEN and INSTAGRAM_BUSINESS_ACCOUNT_ID),
+        'facebook_configured': bool(FACEBOOK_ACCESS_TOKEN and FACEBOOK_PAGE_ID),
         'whatsapp_session': os.path.exists(WHATSAPP_SESSION_PATH),
         'linkedin_session': os.path.exists(LINKEDIN_SESSION_PATH),
         'dry_run': DRY_RUN,
@@ -104,6 +118,12 @@ def print_config_status():
     print("\n[LINKEDIN] LinkedIn Configuration:")
     print(f"  [OK] LinkedIn API configured" if status['linkedin_configured'] else "  [NO] LinkedIn API not configured")
 
+    print("\n[INSTAGRAM] Instagram Configuration:")
+    print(f"  [OK] Instagram API configured" if status['instagram_configured'] else "  [NO] Instagram API not configured")
+
+    print("\n[FACEBOOK] Facebook Configuration:")
+    print(f"  [OK] Facebook API configured" if status['facebook_configured'] else "  [NO] Facebook API not configured")
+
     print("\n[WHATSAPP] WhatsApp Configuration:")
     print(f"  [OK] WhatsApp session found" if status['whatsapp_session'] else "  [NO] WhatsApp session not found")
 
@@ -118,9 +138,9 @@ def print_config_status():
 
     print("\n" + "=" * 60)
 
-    if not (status['gmail_configured'] and status['linkedin_configured']):
+    if not (status['gmail_configured'] and status['linkedin_configured'] and status['instagram_configured'] and status['facebook_configured']):
         print("\n[WARNING] MISSING CREDENTIALS!")
-        print("See CREDENTIALS_SETUP.md for setup instructions")
+        print("See INSTAGRAM_FACEBOOK_SETUP.md for setup instructions")
     else:
         print("\n[SUCCESS] All credentials configured!")
 

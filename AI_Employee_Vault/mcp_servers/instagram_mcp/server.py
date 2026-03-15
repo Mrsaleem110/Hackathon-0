@@ -6,7 +6,7 @@ Exposes Instagram posting and insights via MCP protocol
 import json
 import logging
 from typing import Any
-from instagram_client import InstagramClient
+from .instagram_client import InstagramClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

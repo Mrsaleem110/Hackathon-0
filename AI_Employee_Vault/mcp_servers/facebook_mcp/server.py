@@ -6,7 +6,7 @@ Exposes Facebook posting and insights via MCP protocol
 import json
 import logging
 from typing import Any
-from facebook_client import FacebookClient
+from .facebook_client import FacebookClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

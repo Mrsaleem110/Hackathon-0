@@ -18,7 +18,7 @@ Send invoice to client via email
 
 ## Details
 - Client: Client A
-- Email: clienta@example.com
+- Email: agentic_sphere@gmail.com.com
 - Invoice: #1234
 - Amount: $5,000
 - Due: 2026-03-15

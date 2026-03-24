@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Instagram + Facebook Setup - Dono credentials ek saath add karo
 """
 
 import os
+import sys
 from pathlib import Path
+
+# Fix encoding for Windows
+if sys.platform == 'win32':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 def print_header(title):
     print("\n" + "="*70)
@@ -12,7 +19,7 @@ def print_header(title):
     print("="*70)
 
 def print_section(title):
-    print(f"\n📌 {title}")
+    print(f"\n[*] {title}")
     print("-"*70)
 
 def setup_instagram():
@@ -21,21 +28,21 @@ def setup_instagram():
     print("""
 Instagram credentials ke liye:
 1. https://business.facebook.com/ par jao
-2. Settings → Apps and Websites
+2. Settings -> Apps and Websites
 3. Instagram Business Account add karo
 4. Business Account ID aur Access Token copy karo
 
 Ya:
 1. https://developers.facebook.com/
-2. App create karo → Instagram Basic Display add karo
+2. App create karo -> Instagram Basic Display add karo
 3. Access token generate karo
     """)
 
-    access_token = input("\n🔑 INSTAGRAM_ACCESS_TOKEN: ").strip()
-    business_account_id = input("🔑 INSTAGRAM_BUSINESS_ACCOUNT_ID: ").strip()
+    access_token = input("\n[?] INSTAGRAM_ACCESS_TOKEN: ").strip()
+    business_account_id = input("[?] INSTAGRAM_BUSINESS_ACCOUNT_ID: ").strip()
 
     if not access_token or not business_account_id:
-        print("❌ Instagram credentials empty hain!")
+        print("[!] Instagram credentials empty hain!")
         return None
 
     return {
@@ -51,22 +58,22 @@ Facebook credentials ke liye:
 1. https://developers.facebook.com/ par jao
 2. App create karo (type: Business)
 3. Facebook Login product add karo
-4. Settings → Basic mein App ID dekho
+4. Settings -> Basic mein App ID dekho
 5. Token generate karo with scopes:
    - pages_manage_posts
    - pages_read_engagement
 
 Ya:
 1. https://developers.facebook.com/tools/explorer/
-2. Get Token → Page Access Token select karo
+2. Get Token -> Page Access Token select karo
 3. Token copy karo
     """)
 
-    access_token = input("\n🔑 FACEBOOK_ACCESS_TOKEN: ").strip()
-    page_id = input("🔑 FACEBOOK_PAGE_ID: ").strip()
+    access_token = input("\n[?] FACEBOOK_ACCESS_TOKEN: ").strip()
+    page_id = input("[?] FACEBOOK_PAGE_ID: ").strip()
 
     if not access_token or not page_id:
-        print("❌ Facebook credentials empty hain!")
+        print("[!] Facebook credentials empty hain!")
         return None
 
     return {
@@ -79,7 +86,7 @@ def update_env(credentials):
     env_path = Path(__file__).parent / '.env'
 
     if not env_path.exists():
-        print(f"❌ .env file nahi mila: {env_path}")
+        print(f"[!] .env file nahi mila: {env_path}")
         return False
 
     with open(env_path, 'r') as f:
@@ -126,13 +133,13 @@ def verify_setup():
                 if line.startswith(f"{key}="):
                     value = line.split('=', 1)[1].strip()
                     if value and not value.startswith('demo_') and not value.startswith('IGAB_demo') and not value.startswith('EAAB_demo'):
-                        print(f"✅ {label}: Set")
+                        print(f"[+] {label}: Set")
                     else:
-                        print(f"⏳ {label}: Demo token (update needed)")
+                        print(f"[~] {label}: Demo token (update needed)")
                         all_good = False
                     break
         else:
-            print(f"❌ {label}: Not found")
+            print(f"[-] {label}: Not found")
             all_good = False
 
     return all_good
@@ -144,8 +151,8 @@ def main():
 Yeh script tumhare Instagram aur Facebook credentials ko .env mein add karega.
 
 Tumhe chahiye:
-✓ Instagram Business Account ID aur Access Token
-✓ Facebook Page ID aur Access Token
+[+] Instagram Business Account ID aur Access Token
+[+] Facebook Page ID aur Access Token
 
 Chalo shuru karte hain!
     """)
@@ -166,9 +173,9 @@ Chalo shuru karte hain!
     # Update .env
     print_section("UPDATING .env FILE")
     if update_env(all_creds):
-        print("✅ .env file update ho gaya!")
+        print("[+] .env file update ho gaya!")
     else:
-        print("❌ .env update nahi hua")
+        print("[-] .env update nahi hua")
         return False
 
     # Verify
@@ -180,19 +187,19 @@ Chalo shuru karte hain!
 Ab tum ye kar sakte ho:
 
 1. Test credentials:
-   python test_mcp_servers.py
+   python test_insta_fb.py
 
 2. Instagram post karo:
-   python -c "from mcp_servers.instagram_mcp import InstagramClient; ig = InstagramClient(); print(ig.post_feed('Hello Instagram!', 'https://example.com/image.jpg'))"
+   python auto_post_social.py
 
-3. Facebook post karo:
-   python -c "from mcp_servers.facebook_mcp import FacebookClient; fb = FacebookClient(); print(fb.post_feed('Hello Facebook!', 'https://example.com/link'))"
+3. Dashboard dekho:
+   python social_dashboard.py
 
 4. Orchestrator start karo:
    python orchestrator.py
     """)
 
-    print_header("SETUP COMPLETE ✅")
+    print_header("SETUP COMPLETE")
     return True
 
 if __name__ == '__main__':
@@ -200,8 +207,10 @@ if __name__ == '__main__':
         success = main()
         exit(0 if success else 1)
     except KeyboardInterrupt:
-        print("\n\n❌ Setup cancel ho gaya")
+        print("\n\n[-] Setup cancel ho gaya")
         exit(1)
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n[-] Error: {e}")
+        import traceback
+        traceback.print_exc()
         exit(1)

@@ -1,0 +1,45 @@
+domains:
+  personal:
+    email_domains:
+      - gmail.com
+      - yahoo.com
+      - outlook.com
+      - hotmail.com
+    approval_threshold: 30
+    auto_approve: false
+    channels:
+      - gmail
+      - whatsapp
+    retention_days: 90
+
+  business:
+    email_domains:
+      - company.com
+      - business.com
+      - work.com
+    approval_threshold: 70
+    auto_approve: true
+    channels:
+      - gmail
+      - linkedin
+      - odoo
+    retention_days: 365
+
+routing:
+  default_domain: business
+  unknown_domain_handling: business
+  case_sensitive: false
+
+approval:
+  personal:
+    email_threshold: 100
+    social_threshold: 50
+    accounting_threshold: 500
+  business:
+    email_threshold: 1000
+    social_threshold: 500
+    accounting_threshold: 5000
+
+logging:
+  separate_by_domain: true
+  include_domain_in_logs: true

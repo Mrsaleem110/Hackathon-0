@@ -6,7 +6,7 @@ from typing import Dict, List, Any, Optional
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.api_python_client import discovery
+from googleapiclient.discovery import build
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import base64
@@ -52,7 +52,7 @@ class EmailClient:
             with open(self.token_file, 'w') as token:
                 token.write(creds.to_json())
 
-        self.service = discovery.build('gmail', 'v1', credentials=creds)
+        self.service = build('gmail', 'v1', credentials=creds)
         logger.info("Gmail authentication successful")
         return True
 

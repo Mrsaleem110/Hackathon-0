@@ -81,14 +81,39 @@ class InstagramClient:
 
             response = requests.post(
                 f"{self.base_url}/{self.business_account_id}/media",
-                data=container_payload
+                data=container_payload,
+                timeout=10
             )
 
             if response.status_code != 200:
-                return {
-                    "success": False,
-                    "error": f"Failed to create media container: {response.text}"
-                }
+                error_msg = response.text
+                logger.warning(f"Instagram API error: {error_msg}")
+
+                # Check for common API restrictions
+                if "RATE_LIMIT" in error_msg or "rate_limit" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Rate limit exceeded. Please try again later.",
+                        "status": "rate_limited"
+                    }
+                elif "PERMISSION" in error_msg or "permission" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Permission denied. Account may need approval or paid promotion.",
+                        "status": "permission_denied"
+                    }
+                elif "INVALID_TOKEN" in error_msg or "invalid_token" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Invalid or expired access token.",
+                        "status": "invalid_token"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": f"Failed to create media container: {error_msg}",
+                        "status": "api_error"
+                    }
 
             container_id = response.json()["id"]
 
@@ -100,13 +125,17 @@ class InstagramClient:
 
             publish_response = requests.post(
                 f"{self.base_url}/{self.business_account_id}/media_publish",
-                data=publish_payload
+                data=publish_payload,
+                timeout=10
             )
 
             if publish_response.status_code != 200:
+                error_msg = publish_response.text
+                logger.warning(f"Instagram publish error: {error_msg}")
                 return {
                     "success": False,
-                    "error": f"Failed to publish: {publish_response.text}"
+                    "error": f"Failed to publish: {error_msg}",
+                    "status": "publish_failed"
                 }
 
             post_id = publish_response.json()["id"]
@@ -119,9 +148,12 @@ class InstagramClient:
                 "created_at": datetime.utcnow().isoformat()
             }
 
+        except requests.exceptions.Timeout:
+            logger.error("Instagram API request timeout")
+            return {"success": False, "error": "Request timeout", "status": "timeout"}
         except Exception as e:
             logger.error(f"Error posting to Instagram: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "status": "error"}
 
     def post_story(self, image_url: str) -> Dict[str, Any]:
         """

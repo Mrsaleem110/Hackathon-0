@@ -88,14 +88,45 @@ class FacebookClient:
 
             response = requests.post(
                 f"{self.base_url}/{self.page_id}/feed",
-                data=payload
+                data=payload,
+                timeout=10
             )
 
             if response.status_code != 200:
-                return {
-                    "success": False,
-                    "error": f"Failed to post: {response.text}"
-                }
+                error_msg = response.text
+                logger.warning(f"Facebook API error: {error_msg}")
+
+                # Check for common API restrictions
+                if "RATE_LIMIT" in error_msg or "rate_limit" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Rate limit exceeded. Please try again later.",
+                        "status": "rate_limited"
+                    }
+                elif "PERMISSION" in error_msg or "permission" in error_msg or "permission_error" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Permission denied. Page may require paid promotion or account approval.",
+                        "status": "permission_denied"
+                    }
+                elif "INVALID_TOKEN" in error_msg or "invalid_token" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Invalid or expired access token.",
+                        "status": "invalid_token"
+                    }
+                elif "INVALID_PARAM" in error_msg or "invalid_param" in error_msg:
+                    return {
+                        "success": False,
+                        "error": "Invalid parameters. Check page ID and token.",
+                        "status": "invalid_param"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": f"Failed to post: {error_msg}",
+                        "status": "api_error"
+                    }
 
             post_id = response.json()["id"]
             logger.info(f"Posted to Facebook: {post_id}")
@@ -107,9 +138,12 @@ class FacebookClient:
                 "created_at": datetime.utcnow().isoformat()
             }
 
+        except requests.exceptions.Timeout:
+            logger.error("Facebook API request timeout")
+            return {"success": False, "error": "Request timeout", "status": "timeout"}
         except Exception as e:
             logger.error(f"Error posting to Facebook: {e}")
-            return {"success": False, "error": str(e)}
+            return {"success": False, "error": str(e), "status": "error"}
 
     def post_video(
         self,

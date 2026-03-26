@@ -32,14 +32,15 @@ class CEOBriefingScheduler:
 
         if SCHEDULER_AVAILABLE:
             self.scheduler = BackgroundScheduler()
-            logger.info("CEO Briefing Scheduler initialized")
+            logger.info("CEO Briefing Scheduler initialized with APScheduler")
         else:
-            logger.warning("APScheduler not available - scheduling disabled")
+            logger.warning("APScheduler not available - using manual scheduling mode")
+            logger.info("You can still generate and send briefings manually")
 
     def schedule_weekly_briefing(self, day_of_week: str = 'mon', hour: int = 9, minute: int = 0):
         """Schedule weekly briefing"""
         if not self.scheduler:
-            logger.error("Scheduler not available")
+            logger.warning("Scheduler not available - use generate_briefing_now() instead")
             return False
 
         try:
@@ -117,6 +118,46 @@ class CEOBriefingScheduler:
         except Exception as e:
             logger.error(f"Failed to send briefing: {e}")
             return False
+
+    def generate_briefing_now(self) -> Dict[str, Any]:
+        """Generate and save briefing immediately (works without scheduler)"""
+        try:
+            logger.info("Generating CEO briefing now...")
+
+            # Generate briefing
+            if self.briefing_generator:
+                briefing = self.briefing_generator.generate_weekly_briefing()
+            else:
+                briefing = self._generate_default_briefing()
+
+            # Save briefing
+            briefing_file = self.briefings_dir / f"briefing_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            with open(briefing_file, 'w') as f:
+                json.dump(briefing, f, indent=2)
+
+            logger.info(f"Briefing saved to {briefing_file}")
+
+            # Format and save as email
+            email_body = self._format_briefing_email(briefing)
+            email_file = self.briefings_dir / f"email_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+            with open(email_file, 'w') as f:
+                f.write(email_body)
+
+            logger.info(f"Email saved to {email_file}")
+
+            return {
+                "success": True,
+                "briefing_file": str(briefing_file),
+                "email_file": str(email_file),
+                "briefing": briefing
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to generate briefing: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
 
     def start(self):
         """Start scheduler"""

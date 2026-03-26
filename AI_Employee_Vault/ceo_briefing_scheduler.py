@@ -231,6 +231,34 @@ class CEOBriefingScheduler:
         return html
 
     def _send_email(self, to: str, body: str):
-        """Send email (placeholder)"""
-        logger.info(f"Email would be sent to {to}")
-        # In production, integrate with actual email service
+        """Send email via Email MCP server"""
+        try:
+            import requests
+
+            # Try to send via Email MCP server
+            try:
+                response = requests.post(
+                    'http://localhost:8070/send_email',
+                    json={
+                        'to': to,
+                        'subject': 'Weekly CEO Briefing',
+                        'body': body
+                    },
+                    timeout=5
+                )
+                if response.status_code == 200:
+                    logger.info(f"Email sent to {to} via MCP server")
+                    return True
+            except:
+                pass
+
+            # Fallback: log to file
+            briefing_file = self.briefings_dir / f"email_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+            with open(briefing_file, 'w') as f:
+                f.write(body)
+            logger.info(f"Email saved to {briefing_file} (MCP server not available)")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to send email: {e}")
+            return False

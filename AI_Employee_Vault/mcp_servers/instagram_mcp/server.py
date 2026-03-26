@@ -1,55 +1,75 @@
 """
-Instagram MCP Server
+Instagram MCP Server - FastAPI
 Exposes Instagram posting and insights via MCP protocol
+Port: 8077
 """
 
-import json
+import os
 import logging
-from typing import Any
+from datetime import datetime
+from typing import Optional
+from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 from .instagram_client import InstagramClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+app = FastAPI(title="Instagram MCP Server", version="1.0.0")
+instagram_client = InstagramClient(dry_run=True)
 
-class InstagramMCPServer:
-    """MCP server for Instagram operations"""
+class PostFeedRequest(BaseModel):
+    caption: str
+    image_url: Optional[str] = None
+    media_type: str = "IMAGE"
 
-    def __init__(self):
-        self.client = InstagramClient()
+class PostStoryRequest(BaseModel):
+    image_url: str
 
-    def post_feed(self, caption: str, image_url: str = None, media_type: str = "IMAGE") -> dict:
-        """Post to Instagram feed"""
-        return self.client.post_feed(caption, image_url, media_type)
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "service": "instagram_mcp",
+        "timestamp": datetime.now().isoformat()
+    }
 
-    def post_story(self, image_url: str) -> dict:
-        """Post to Instagram story"""
-        return self.client.post_story(image_url)
+@app.post("/post_feed")
+async def post_feed(request: PostFeedRequest):
+    """Post to Instagram feed"""
+    try:
+        result = instagram_client.post_feed(
+            caption=request.caption,
+            image_url=request.image_url,
+            media_type=request.media_type
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error posting to feed: {e}")
+        return {"success": False, "error": str(e)}
 
-    def get_insights(self) -> dict:
-        """Get Instagram account insights"""
-        return self.client.get_insights()
+@app.post("/post_story")
+async def post_story(request: PostStoryRequest):
+    """Post to Instagram story"""
+    try:
+        result = instagram_client.post_story(image_url=request.image_url)
+        return result
+    except Exception as e:
+        logger.error(f"Error posting story: {e}")
+        return {"success": False, "error": str(e)}
 
-    def handle_request(self, request: dict) -> dict:
-        """Handle MCP request"""
-        method = request.get("method")
-        params = request.get("params", {})
-
-        try:
-            if method == "post_feed":
-                return self.post_feed(**params)
-            elif method == "post_story":
-                return self.post_story(**params)
-            elif method == "get_insights":
-                return self.get_insights()
-            else:
-                return {"success": False, "error": f"Unknown method: {method}"}
-        except Exception as e:
-            logger.error(f"Error handling request: {e}")
-            return {"success": False, "error": str(e)}
-
+@app.get("/get_insights")
+async def get_insights():
+    """Get Instagram account insights"""
+    try:
+        result = instagram_client.get_insights()
+        return result
+    except Exception as e:
+        logger.error(f"Error getting insights: {e}")
+        return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
-    server = InstagramMCPServer()
-    print("Instagram MCP Server initialized")
-    print("Available methods: post_feed, post_story, get_insights")
+    port = int(os.getenv('INSTAGRAM_MCP_PORT', 8077))
+    uvicorn.run(app, host="0.0.0.0", port=port)

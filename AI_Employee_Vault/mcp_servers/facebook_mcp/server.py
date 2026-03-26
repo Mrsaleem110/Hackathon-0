@@ -1,61 +1,95 @@
 """
-Facebook MCP Server
+Facebook MCP Server - FastAPI
 Exposes Facebook posting and insights via MCP protocol
+Port: 8078
 """
 
-import json
+import os
 import logging
-from typing import Any
+from datetime import datetime
+from typing import Optional
+from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 from .facebook_client import FacebookClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+app = FastAPI(title="Facebook MCP Server", version="1.0.0")
+facebook_client = FacebookClient(dry_run=True)
 
-class FacebookMCPServer:
-    """MCP server for Facebook operations"""
+class PostFeedRequest(BaseModel):
+    message: str
+    link: Optional[str] = None
+    picture: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
 
-    def __init__(self):
-        self.client = FacebookClient()
+class PostVideoRequest(BaseModel):
+    video_url: str
+    title: str
+    description: str
 
-    def post_feed(self, message: str, link: str = None, picture: str = None, name: str = None, description: str = None) -> dict:
-        """Post to Facebook page feed"""
-        return self.client.post_feed(message, link, picture, name, description)
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return {
+        "status": "healthy",
+        "service": "facebook_mcp",
+        "timestamp": datetime.now().isoformat()
+    }
 
-    def post_video(self, video_url: str, title: str, description: str) -> dict:
-        """Post video to Facebook page"""
-        return self.client.post_video(video_url, title, description)
+@app.post("/post_feed")
+async def post_feed(request: PostFeedRequest):
+    """Post to Facebook page feed"""
+    try:
+        result = facebook_client.post_feed(
+            message=request.message,
+            link=request.link,
+            picture=request.picture,
+            name=request.name,
+            description=request.description
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error posting to feed: {e}")
+        return {"success": False, "error": str(e)}
 
-    def get_page_insights(self) -> dict:
-        """Get Facebook page insights"""
-        return self.client.get_page_insights()
+@app.post("/post_video")
+async def post_video(request: PostVideoRequest):
+    """Post video to Facebook page"""
+    try:
+        result = facebook_client.post_video(
+            video_url=request.video_url,
+            title=request.title,
+            description=request.description
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error posting video: {e}")
+        return {"success": False, "error": str(e)}
 
-    def get_feed(self, limit: int = 10) -> dict:
-        """Get recent posts from Facebook feed"""
-        return self.client.get_feed(limit)
+@app.get("/get_page_insights")
+async def get_page_insights():
+    """Get Facebook page insights"""
+    try:
+        result = facebook_client.get_page_insights()
+        return result
+    except Exception as e:
+        logger.error(f"Error getting insights: {e}")
+        return {"success": False, "error": str(e)}
 
-    def handle_request(self, request: dict) -> dict:
-        """Handle MCP request"""
-        method = request.get("method")
-        params = request.get("params", {})
-
-        try:
-            if method == "post_feed":
-                return self.post_feed(**params)
-            elif method == "post_video":
-                return self.post_video(**params)
-            elif method == "get_page_insights":
-                return self.get_page_insights()
-            elif method == "get_feed":
-                return self.get_feed(**params)
-            else:
-                return {"success": False, "error": f"Unknown method: {method}"}
-        except Exception as e:
-            logger.error(f"Error handling request: {e}")
-            return {"success": False, "error": str(e)}
-
+@app.get("/get_feed")
+async def get_feed(limit: int = 10):
+    """Get recent posts from Facebook feed"""
+    try:
+        result = facebook_client.get_feed(limit=limit)
+        return result
+    except Exception as e:
+        logger.error(f"Error getting feed: {e}")
+        return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
-    server = FacebookMCPServer()
-    print("Facebook MCP Server initialized")
-    print("Available methods: post_feed, post_video, get_page_insights, get_feed")
+    port = int(os.getenv('FACEBOOK_MCP_PORT', 8078))
+    uvicorn.run(app, host="0.0.0.0", port=port)

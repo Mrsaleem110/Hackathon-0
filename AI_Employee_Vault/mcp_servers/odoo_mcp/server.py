@@ -16,7 +16,7 @@ from pydantic import BaseModel
 import uvicorn
 from dotenv import load_dotenv
 
-from odoo_client import OdooClient
+from .odoo_client import OdooClient
 
 # Load environment variables
 load_dotenv()

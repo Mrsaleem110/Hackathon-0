@@ -1,0 +1,10 @@
+[
+  {
+    "timestamp": "2026-03-19T14:42:07.274023",
+    "to": "sm6928234@gmail.com",
+    "subject": "Meeting Reminder - 4:00 PM Today",
+    "type": "meeting_reminder_4pm",
+    "status": "sent",
+    "message_id": "19d05793525f30f4"
+  }
+]

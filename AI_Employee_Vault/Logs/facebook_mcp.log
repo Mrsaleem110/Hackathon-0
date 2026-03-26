@@ -1,0 +1,12 @@
+INFO:mcp_servers.facebook_mcp.facebook_client:Facebook client initialized for page 1048264368365205
+INFO:     Started server process [5396]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8078 (Press CTRL+C to quit)
+Starting Facebook MCP Server on port 8078...
+INFO:     127.0.0.1:55592 - "GET /health HTTP/1.1" 200 OK
+INFO:mcp_servers.facebook_mcp.facebook_client:[DRY-RUN] Would post to Facebook: Test post from Gold Tier!...
+INFO:     127.0.0.1:55599 - "POST /post_feed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55673 - "GET /health HTTP/1.1" 200 OK
+INFO:mcp_servers.facebook_mcp.facebook_client:[DRY-RUN] Would post to Facebook: Test post from Gold Tier!...
+INFO:     127.0.0.1:55681 - "POST /post_feed HTTP/1.1" 200 OK

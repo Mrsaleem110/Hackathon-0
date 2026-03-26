@@ -1,0 +1,12 @@
+INFO:     Started server process [11732]
+INFO:     Waiting for application startup.
+ERROR:mcp_servers.odoo_mcp.odoo_client:RPC call failed: HTTPConnectionPool(host='localhost', port=8069): Max retries exceeded with url: /jsonrpc (Caused by NewConnectionError("HTTPConnection(host='localhost', port=8069): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+ERROR:mcp_servers.odoo_mcp.odoo_client:Authentication failed: HTTPConnectionPool(host='localhost', port=8069): Max retries exceeded with url: /jsonrpc (Caused by NewConnectionError("HTTPConnection(host='localhost', port=8069): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it"))
+WARNING:mcp_servers.odoo_mcp.server:Odoo authentication failed
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8079 (Press CTRL+C to quit)
+Starting Odoo MCP Server on port 8079...
+INFO:     127.0.0.1:55594 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55601 - "GET /tools HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55677 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55683 - "GET /tools HTTP/1.1" 200 OK

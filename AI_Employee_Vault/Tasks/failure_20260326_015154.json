@@ -1,0 +1,8 @@
+{
+  "task_id": "test_001",
+  "task_title": "Test Email Campaign",
+  "step_num": 1,
+  "step_name": "Validate Recipients",
+  "error": "Verification failed",
+  "timestamp": "2026-03-26T01:51:54.419236"
+}

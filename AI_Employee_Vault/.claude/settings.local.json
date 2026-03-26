@@ -4,7 +4,18 @@
       "Bash(python:*)",
       "Bash(cat:*)",
       "Bash(ls:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(grep -E \"\\\\.py$\")",
+      "Bash(mv Pending_Approval/LINKEDIN_POST_*.md Done/)",
+      "Bash(mv Pending_Approval/PLAN_EMAIL_*.md Done/)",
+      "Bash(mv Pending_Approval/WHATSAPP_REPLY_*.md Done/)",
+      "Bash(\"C:\\\\Users\\\\Agentic Sphere\\\\Documents\\\\GitHub\\\\Hackathon-0\\\\ai_employee_vault\\\\FINAL_SUMMARY.md\":*)",
+      "Bash(\"C:\\\\Users\\\\Agentic Sphere\\\\Documents\\\\GitHub\\\\Hackathon-0\\\\ai_employee_vault\\\\EXECUTIVE_SUMMARY.txt\":*)",
+      "Bash(pip list:*)",
+      "Bash(curl http://localhost:8073/health)",
+      "Bash(curl http://localhost:8075/health)",
+      "Bash(curl -s http://localhost:8070/health http://localhost:8072/health http://localhost:8073/health http://localhost:8075/health)",
+      "Bash(netstat -ano)"
     ]
   }
 }

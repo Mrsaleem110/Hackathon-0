@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-03-29T15:11:18.130921",
+  "agent": "cloud",
+  "type": "alert",
+  "content": {
+    "level": "CRITICAL",
+    "message": "Cloud health: OPERATIONAL",
+    "alerts": [
+      "MCP email_mcp: DOWN",
+      "MCP vault_mcp: DOWN",
+      "MCP whatsapp_mcp: DOWN",
+      "MCP odoo_mcp: DOWN",
+      "MCP twitter_mcp: DOWN",
+      "Cloud Agent: NOT_RUNNING"
+    ],
+    "status": "OPERATIONAL"
+  }
+}

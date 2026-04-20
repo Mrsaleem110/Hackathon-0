@@ -1,0 +1,143 @@
+{
+  "timestamp": "2026-03-28T15:53:01.107521",
+  "week_ending": "2026-03-29T15:53:01.107535",
+  "audit_type": "weekly_comprehensive",
+  "sections": {
+    "financial_audit": {
+      "status": "error",
+      "error": "HTTPConnectionPool(host='localhost', port=8074): Max retries exceeded with url: /tools/get_financial_summary (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=8074): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+    },
+    "operational_audit": {
+      "status": "error",
+      "error": "HTTPConnectionPool(host='localhost', port=8074): Max retries exceeded with url: /tools/get_sales_pipeline (Caused by NewConnectionError(\"HTTPConnection(host='localhost', port=8074): Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it\"))"
+    },
+    "compliance_audit": {
+      "status": "completed",
+      "audit_trail": {
+        "total_actions": 247,
+        "actions_by_type": {
+          "unknown": 241,
+          "test_action": 1,
+          "workflow_test": 1,
+          "gold_tier_demo": 1,
+          "demo_action": 1,
+          "gold_tier_test": 2
+        },
+        "failed_actions": 3,
+        "success_rate": 87.4493927125506
+      },
+      "data_integrity": {
+        "records_checked": 500,
+        "discrepancies_found": 2,
+        "integrity_score": 99.6
+      },
+      "access_control": {
+        "unauthorized_attempts": 0,
+        "permission_changes": 3,
+        "security_incidents": 0
+      },
+      "compliance_findings": []
+    },
+    "performance_metrics": {
+      "system_health": {
+        "uptime_percentage": 99.8,
+        "response_time_ms": 245,
+        "error_rate": 0.2,
+        "services_healthy": 8,
+        "services_degraded": 0
+      },
+      "social_media": {
+        "total_posts": 25,
+        "total_engagement": 1250,
+        "reach": 5000,
+        "top_performing_post": {
+          "platform": "LinkedIn",
+          "engagement": 450,
+          "reach": 2000
+        }
+      },
+      "email_metrics": {
+        "emails_sent": 150,
+        "open_rate": 42.5,
+        "click_rate": 8.3,
+        "bounce_rate": 1.2
+      },
+      "api_usage": {
+        "total_calls": 5000,
+        "rate_limit_hits": 0,
+        "error_responses": 5
+      }
+    },
+    "risk_assessment": {
+      "total_risks": 2,
+      "critical": 0,
+      "high": 2,
+      "medium": 0,
+      "risks": [
+        {
+          "severity": "high",
+          "category": "financial",
+          "issue": "Revenue below target",
+          "impact": "May not meet quarterly goals",
+          "recommendation": "Increase sales efforts and pipeline development"
+        },
+        {
+          "severity": "high",
+          "category": "operational",
+          "issue": "Weak sales pipeline",
+          "impact": "Future revenue at risk",
+          "recommendation": "Accelerate lead generation and qualification"
+        }
+      ]
+    },
+    "recommendations": [
+      {
+        "priority": "high",
+        "category": "financial",
+        "title": "Improve Profit Margin",
+        "description": "Current margin is 0.0%, target is 25%",
+        "actions": [
+          "Review pricing strategy",
+          "Optimize cost structure",
+          "Reduce operational expenses"
+        ],
+        "expected_impact": "Increase profit by 5-10%"
+      },
+      {
+        "priority": "high",
+        "category": "sales",
+        "title": "Accelerate Revenue Growth",
+        "description": "Current revenue $0, target is $100,000",
+        "actions": [
+          "Launch new marketing campaign",
+          "Increase sales team capacity",
+          "Develop new product offerings"
+        ],
+        "expected_impact": "Increase revenue by 50%"
+      },
+      {
+        "priority": "medium",
+        "category": "sales",
+        "title": "Build Sales Pipeline",
+        "description": "Current opportunities: 0, target is 20+",
+        "actions": [
+          "Increase lead generation activities",
+          "Improve lead qualification process",
+          "Implement nurture campaigns"
+        ],
+        "expected_impact": "Increase pipeline by 100%"
+      }
+    ]
+  },
+  "summary": {
+    "overall_health": "healthy",
+    "key_metrics": {
+      "revenue": 0,
+      "profit": 0,
+      "pipeline_value": 0,
+      "completion_rate": 0
+    },
+    "critical_issues": 0,
+    "action_items": 2
+  }
+}

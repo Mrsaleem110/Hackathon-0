@@ -1,0 +1,70 @@
+[
+  {
+    "timestamp": "2026-03-29T15:09:20.526724",
+    "is_consistent": true,
+    "issues": [],
+    "warnings": [
+      "DUPLICATE: GMAIL_demo_1_demo.md found in 2 locations",
+      "DUPLICATE: GMAIL_demo_2_demo.md found in 2 locations",
+      "DUPLICATE: PLAN_EMAIL_agentic_intro_salam.md found in 2 locations",
+      "MISSING: Required directory Plans/email not found",
+      "MISSING: Required directory Plans/social not found",
+      "MISSING: Required directory Plans/whatsapp not found",
+      "MISSING: Required directory Plans/payments not found"
+    ],
+    "stats": {
+      "total_tasks": 3,
+      "needs_action": {
+        "email": 0,
+        "social": 0,
+        "whatsapp": 0,
+        "payments": 0
+      },
+      "in_progress": {
+        "cloud": 2,
+        "local": 0
+      },
+      "pending_approval": {
+        "email": 0,
+        "social": 0,
+        "payments": 1
+      },
+      "approved": 0,
+      "done": 52
+    }
+  },
+  {
+    "timestamp": "2026-03-29T15:09:24.871843",
+    "is_consistent": true,
+    "issues": [],
+    "warnings": [
+      "DUPLICATE: GMAIL_demo_1_demo.md found in 2 locations",
+      "DUPLICATE: GMAIL_demo_2_demo.md found in 2 locations",
+      "DUPLICATE: PLAN_EMAIL_agentic_intro_salam.md found in 2 locations",
+      "MISSING: Required directory Plans/email not found",
+      "MISSING: Required directory Plans/social not found",
+      "MISSING: Required directory Plans/whatsapp not found",
+      "MISSING: Required directory Plans/payments not found"
+    ],
+    "stats": {
+      "total_tasks": 3,
+      "needs_action": {
+        "email": 0,
+        "social": 0,
+        "whatsapp": 0,
+        "payments": 0
+      },
+      "in_progress": {
+        "cloud": 2,
+        "local": 0
+      },
+      "pending_approval": {
+        "email": 0,
+        "social": 0,
+        "payments": 1
+      },
+      "approved": 0,
+      "done": 52
+    }
+  }
+]

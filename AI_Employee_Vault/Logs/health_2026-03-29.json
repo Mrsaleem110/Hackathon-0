@@ -1,0 +1,133 @@
+[
+  {
+    "timestamp": "2026-03-29T15:10:51.997093",
+    "overall_status": "DEGRADED",
+    "checks": {
+      "cpu": {
+        "status": "DEGRADED",
+        "usage": 81.7,
+        "cores": 4,
+        "threshold": 80.0
+      },
+      "memory": {
+        "status": "HEALTHY",
+        "usage": 58.4,
+        "total_gb": 7.887866973876953,
+        "available_gb": 3.2823562622070312,
+        "threshold": 80.0
+      },
+      "disk": {
+        "status": "HEALTHY",
+        "usage": 56.3,
+        "total_gb": 87.18651962280273,
+        "free_gb": 38.1187858581543,
+        "threshold": 80.0
+      },
+      "mcp_servers": {
+        "email_mcp": {
+          "status": "DOWN",
+          "port": 8070,
+          "response_time_ms": 0
+        },
+        "vault_mcp": {
+          "status": "DOWN",
+          "port": 8072,
+          "response_time_ms": 0
+        },
+        "whatsapp_mcp": {
+          "status": "DOWN",
+          "port": 8073,
+          "response_time_ms": 0
+        },
+        "odoo_mcp": {
+          "status": "DOWN",
+          "port": 8074,
+          "response_time_ms": 0
+        },
+        "twitter_mcp": {
+          "status": "DOWN",
+          "port": 8071,
+          "response_time_ms": 0
+        }
+      },
+      "cloud_agent": {
+        "status": "NOT_RUNNING",
+        "name": "cloud_agent.py"
+      }
+    },
+    "alerts": [
+      "CPU: DEGRADED (81.7%)",
+      "MCP email_mcp: DOWN",
+      "MCP vault_mcp: DOWN",
+      "MCP whatsapp_mcp: DOWN",
+      "MCP odoo_mcp: DOWN",
+      "MCP twitter_mcp: DOWN",
+      "Cloud Agent: NOT_RUNNING"
+    ]
+  },
+  {
+    "timestamp": "2026-03-29T15:11:05.304639",
+    "overall_status": "OPERATIONAL",
+    "checks": {
+      "cpu": {
+        "status": "HEALTHY",
+        "usage": 68.7,
+        "cores": 4,
+        "threshold": 80.0
+      },
+      "memory": {
+        "status": "HEALTHY",
+        "usage": 58.2,
+        "total_gb": 7.887866973876953,
+        "available_gb": 3.2991104125976562,
+        "threshold": 80.0
+      },
+      "disk": {
+        "status": "HEALTHY",
+        "usage": 56.3,
+        "total_gb": 87.18651962280273,
+        "free_gb": 38.11878204345703,
+        "threshold": 80.0
+      },
+      "mcp_servers": {
+        "email_mcp": {
+          "status": "DOWN",
+          "port": 8070,
+          "response_time_ms": 0
+        },
+        "vault_mcp": {
+          "status": "DOWN",
+          "port": 8072,
+          "response_time_ms": 0
+        },
+        "whatsapp_mcp": {
+          "status": "DOWN",
+          "port": 8073,
+          "response_time_ms": 0
+        },
+        "odoo_mcp": {
+          "status": "DOWN",
+          "port": 8074,
+          "response_time_ms": 0
+        },
+        "twitter_mcp": {
+          "status": "DOWN",
+          "port": 8071,
+          "response_time_ms": 0
+        }
+      },
+      "cloud_agent": {
+        "status": "NOT_RUNNING",
+        "name": "cloud_agent.py"
+      }
+    },
+    "alerts": [
+      "MCP email_mcp: DOWN",
+      "MCP vault_mcp: DOWN",
+      "MCP whatsapp_mcp: DOWN",
+      "MCP odoo_mcp: DOWN",
+      "MCP twitter_mcp: DOWN",
+      "Cloud Agent: NOT_RUNNING"
+    ]
+  }
+]

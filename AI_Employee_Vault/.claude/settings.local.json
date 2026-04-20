@@ -15,7 +15,19 @@
       "Bash(curl http://localhost:8073/health)",
       "Bash(curl http://localhost:8075/health)",
       "Bash(curl -s http://localhost:8070/health http://localhost:8072/health http://localhost:8073/health http://localhost:8075/health)",
-      "Bash(netstat -ano)"
+      "Bash(netstat -ano)",
+      "Bash(\"C:\\\\Users\\\\Agentic Sphere\\\\Documents\\\\GitHub\\\\Hackathon-0\\\\ai_employee_vault\\\\QUICK_SETUP_CARD.txt\":*)",
+      "Bash(grep -r \"check_interval\\\\|polling\\\\|retry\\\\|offline\\\\|cache\" /c/Users/Agentic Sphere/Documents/GitHub/Hackathon-0/ai_employee_vault/*.py)",
+      "Bash(find '/c/Users/Agentic Sphere/Documents/GitHub/Hackathon-0/ai_employee_vault/mcp_servers' -name requirements.txt -exec cat {})",
+      "Bash(2)",
+      "Bash(xargs -I {} basename {} -py)",
+      "Bash(sed 's/server//')",
+      "Bash(wc -l /c/Users/Agentic Sphere/Documents/GitHub/Hackathon-0/ai_employee_vault/*.py)",
+      "Bash(find . -type f -name \"*.py\" -path \"*/mcp_servers/*\" -exec basename {})",
+      "Bash(grep -r \"class.*Watcher\" Watchers/*.py)",
+      "Bash(grep -h \"^# \" Plans/*.md)",
+      "Bash(/tmp/vault_complete_report.md:*)",
+      "Read(//tmp/**)"
     ]
   }
 }

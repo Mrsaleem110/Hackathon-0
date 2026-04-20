@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "day": "friday",
+  "time": "17:00",
+  "timezone": "UTC",
+  "auto_email": true,
+  "auto_save": true
+}

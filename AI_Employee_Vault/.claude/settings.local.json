@@ -27,7 +27,8 @@
       "Bash(grep -r \"class.*Watcher\" Watchers/*.py)",
       "Bash(grep -h \"^# \" Plans/*.md)",
       "Bash(/tmp/vault_complete_report.md:*)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Bash(git push *)"
     ]
   }
 }

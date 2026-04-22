@@ -28,7 +28,8 @@
       "Bash(grep -h \"^# \" Plans/*.md)",
       "Bash(/tmp/vault_complete_report.md:*)",
       "Read(//tmp/**)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(git add *)"
     ]
   }
 }

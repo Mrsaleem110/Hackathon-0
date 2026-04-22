@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Simple Interactive Setup - Add Real Instagram & Facebook Credentials
+Interactive Setup - Add Real Credentials for All Platforms
+Supports: Gmail, LinkedIn, Instagram, Facebook, Twitter, WhatsApp
 """
 
 import os
@@ -13,17 +14,14 @@ if sys.platform == 'win32':
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
-
 def print_header(title):
-    print("\n" + "="*70)
+    print("\n" + "="*80)
     print(f"  {title}")
-    print("="*70)
+    print("="*80)
 
 def print_section(title):
     print(f"\n>>> {title}")
-    print("-"*70)
+    print("-"*80)
 
 def print_success(msg):
     print(f"✓ {msg}")
@@ -33,6 +31,52 @@ def print_error(msg):
 
 def print_info(msg):
     print(f"ℹ {msg}")
+
+def show_gmail_guide():
+    """Show Gmail setup guide"""
+    print_section("GMAIL SETUP GUIDE")
+    print("""
+FASTEST WAY (5 minutes):
+
+1. Open: https://console.cloud.google.com/
+
+2. Create new project (or select existing)
+
+3. Enable Gmail API:
+   - Search "Gmail API"
+   - Click "Enable"
+
+4. Create OAuth 2.0 credentials:
+   - Go to Credentials → Create Credentials → OAuth 2.0 Client ID
+   - Choose "Desktop application"
+   - Download JSON file
+
+5. Extract from JSON:
+   - client_id → GMAIL_CLIENT_ID
+   - client_secret → GMAIL_CLIENT_SECRET
+    """)
+
+def show_linkedin_guide():
+    """Show LinkedIn setup guide"""
+    print_section("LINKEDIN SETUP GUIDE")
+    print("""
+FASTEST WAY (5 minutes):
+
+1. Open: https://www.linkedin.com/developers/apps
+
+2. Create new app:
+   - App name: "AI Employee Vault"
+   - LinkedIn Page: Select or create
+   - Accept legal agreement
+
+3. Go to "Auth" tab:
+   - Copy Client ID → LINKEDIN_CLIENT_ID
+   - Copy Client secret → LINKEDIN_CLIENT_SECRET
+
+4. Generate access token:
+   - Add redirect URL: http://localhost:8080/callback
+   - Use OAuth flow to get LINKEDIN_ACCESS_TOKEN
+    """)
 
 def show_instagram_guide():
     """Show Instagram setup guide"""
@@ -52,10 +96,6 @@ FASTEST WAY (2 minutes):
    GET /me/instagram_business_accounts
 
 5. Copy the "id" field (17 digits)
-
-RESULT:
-  Token: IGAB_xxxxxxxxxxxxx...
-  Account ID: 17841400000000
     """)
 
 def show_facebook_guide():
@@ -76,41 +116,116 @@ FASTEST WAY (2 minutes):
    GET /me/accounts
 
 5. Copy the "id" field of your page
-
-RESULT:
-  Token: EAAB_xxxxxxxxxxxxx...
-  Page ID: 1048264368365205
     """)
+
+def show_twitter_guide():
+    """Show Twitter/X setup guide"""
+    print_section("TWITTER/X SETUP GUIDE")
+    print("""
+FASTEST WAY (5 minutes):
+
+1. Open: https://developer.twitter.com/en/portal/dashboard
+
+2. Create app (if not exists)
+
+3. Go to "Keys and tokens" tab
+
+4. Copy the following:
+   - Bearer Token → TWITTER_BEARER_TOKEN
+   - API Key → TWITTER_API_KEY
+   - API Secret → TWITTER_API_SECRET
+   - Access Token → TWITTER_ACCESS_TOKEN
+   - Access Token Secret → TWITTER_ACCESS_SECRET
+
+5. Ensure app has "Read and Write" permissions
+    """)
+
+def show_whatsapp_guide():
+    """Show WhatsApp setup guide"""
+    print_section("WHATSAPP SETUP GUIDE")
+    print("""
+WhatsApp uses session-based authentication (no API key needed).
+
+SETUP (First run):
+
+1. Start orchestrator:
+   python orchestrator.py
+
+2. A QR code will appear in terminal
+
+3. Scan with WhatsApp mobile app
+
+4. Session saved to .whatsapp_session
+
+⚠️  IMPORTANT:
+  - Keep .whatsapp_session file safe
+  - Don't share or commit to git
+  - Session expires after 30 days of inactivity
+    """)
+
+def get_gmail_credentials():
+    """Get Gmail credentials interactively"""
+    print_section("ENTER GMAIL CREDENTIALS")
+    show_gmail_guide()
+    print("\n[?] Enter your Gmail credentials:\n")
+
+    client_id = input("  Gmail Client ID: ").strip()
+    if not client_id:
+        print_error("Client ID cannot be empty")
+        return None
+
+    client_secret = input("  Gmail Client Secret: ").strip()
+    if not client_secret:
+        print_error("Client Secret cannot be empty")
+        return None
+
+    return {
+        'GMAIL_CLIENT_ID': client_id,
+        'GMAIL_CLIENT_SECRET': client_secret
+    }
+
+def get_linkedin_credentials():
+    """Get LinkedIn credentials interactively"""
+    print_section("ENTER LINKEDIN CREDENTIALS")
+    show_linkedin_guide()
+    print("\n[?] Enter your LinkedIn credentials:\n")
+
+    client_id = input("  LinkedIn Client ID: ").strip()
+    if not client_id:
+        print_error("Client ID cannot be empty")
+        return None
+
+    client_secret = input("  LinkedIn Client Secret: ").strip()
+    if not client_secret:
+        print_error("Client Secret cannot be empty")
+        return None
+
+    access_token = input("  LinkedIn Access Token: ").strip()
+    if not access_token:
+        print_error("Access Token cannot be empty")
+        return None
+
+    return {
+        'LINKEDIN_CLIENT_ID': client_id,
+        'LINKEDIN_CLIENT_SECRET': client_secret,
+        'LINKEDIN_ACCESS_TOKEN': access_token
+    }
 
 def get_instagram_credentials():
     """Get Instagram credentials interactively"""
     print_section("ENTER INSTAGRAM CREDENTIALS")
-
     show_instagram_guide()
-
     print("\n[?] Enter your Instagram credentials:\n")
 
-    while True:
-        token = input("  Instagram Access Token (IGAB_...): ").strip()
-        if not token:
-            print_error("Token cannot be empty")
-            continue
-        if not (token.startswith('IGAB_') or token.startswith('EAAB_')):
-            print_info("Note: Token doesn't start with IGAB_ or EAAB_")
-        break
+    token = input("  Instagram Access Token (IGAB_...): ").strip()
+    if not token:
+        print_error("Token cannot be empty")
+        return None
 
-    while True:
-        account_id = input("  Instagram Business Account ID (17 digits): ").strip()
-        if not account_id:
-            print_error("Account ID cannot be empty")
-            continue
-        if not account_id.isdigit():
-            print_error("Account ID must be numeric")
-            continue
-        if len(account_id) < 10:
-            print_error("Account ID seems too short")
-            continue
-        break
+    account_id = input("  Instagram Business Account ID (17 digits): ").strip()
+    if not account_id or not account_id.isdigit():
+        print_error("Account ID must be numeric")
+        return None
 
     return {
         'INSTAGRAM_ACCESS_TOKEN': token,
@@ -120,34 +235,93 @@ def get_instagram_credentials():
 def get_facebook_credentials():
     """Get Facebook credentials interactively"""
     print_section("ENTER FACEBOOK CREDENTIALS")
-
     show_facebook_guide()
-
     print("\n[?] Enter your Facebook credentials:\n")
 
-    while True:
-        token = input("  Facebook Access Token (EAAB_...): ").strip()
-        if not token:
-            print_error("Token cannot be empty")
-            continue
-        if not token.startswith('EAAB_'):
-            print_info("Note: Token should start with EAAB_")
-        break
+    token = input("  Facebook Access Token (EAAB_...): ").strip()
+    if not token:
+        print_error("Token cannot be empty")
+        return None
 
-    while True:
-        page_id = input("  Facebook Page ID (numeric): ").strip()
-        if not page_id:
-            print_error("Page ID cannot be empty")
-            continue
-        if not page_id.isdigit():
-            print_error("Page ID must be numeric")
-            continue
-        break
+    page_id = input("  Facebook Page ID (numeric): ").strip()
+    if not page_id or not page_id.isdigit():
+        print_error("Page ID must be numeric")
+        return None
 
     return {
         'FACEBOOK_ACCESS_TOKEN': token,
         'FACEBOOK_PAGE_ID': page_id
     }
+
+def get_twitter_credentials():
+    """Get Twitter credentials interactively"""
+    print_section("ENTER TWITTER/X CREDENTIALS")
+    show_twitter_guide()
+    print("\n[?] Enter your Twitter credentials:\n")
+
+    bearer_token = input("  Twitter Bearer Token: ").strip()
+    if not bearer_token:
+        print_error("Bearer Token cannot be empty")
+        return None
+
+    api_key = input("  Twitter API Key: ").strip()
+    if not api_key:
+        print_error("API Key cannot be empty")
+        return None
+
+    api_secret = input("  Twitter API Secret: ").strip()
+    if not api_secret:
+        print_error("API Secret cannot be empty")
+        return None
+
+    access_token = input("  Twitter Access Token: ").strip()
+    if not access_token:
+        print_error("Access Token cannot be empty")
+        return None
+
+    access_secret = input("  Twitter Access Token Secret: ").strip()
+    if not access_secret:
+        print_error("Access Token Secret cannot be empty")
+        return None
+
+    return {
+        'TWITTER_BEARER_TOKEN': bearer_token,
+        'TWITTER_API_KEY': api_key,
+        'TWITTER_API_SECRET': api_secret,
+        'TWITTER_ACCESS_TOKEN': access_token,
+        'TWITTER_ACCESS_SECRET': access_secret
+    }
+
+def select_platforms():
+    """Let user select which platforms to configure"""
+    print_section("SELECT PLATFORMS TO CONFIGURE")
+    print("""
+Which platforms do you want to add credentials for?
+
+  1) Gmail
+  2) LinkedIn
+  3) Instagram
+  4) Facebook
+  5) Twitter/X
+  6) WhatsApp (session-based, no setup needed)
+  7) All platforms
+  0) Cancel
+    """)
+
+    choice = input("  Enter choice (0-7): ").strip()
+
+    mapping = {
+        '0': [],
+        '1': ['gmail'],
+        '2': ['linkedin'],
+        '3': ['instagram'],
+        '4': ['facebook'],
+        '5': ['twitter'],
+        '6': ['whatsapp'],
+        '7': ['gmail', 'linkedin', 'instagram', 'facebook', 'twitter', 'whatsapp'],
+    }
+
+    return mapping.get(choice, [])
 
 def update_env_file(credentials):
     """Update .env file with credentials"""
@@ -162,21 +336,29 @@ def update_env_file(credentials):
         with open(env_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
 
-        # Update lines
-        new_lines = []
+        # Update credentials
+        updated_lines = []
+        updated_keys = set()
+
         for line in lines:
             updated = False
             for key, value in credentials.items():
                 if line.startswith(f"{key}="):
-                    new_lines.append(f"{key}={value}\n")
+                    updated_lines.append(f"{key}={value}\n")
+                    updated_keys.add(key)
                     updated = True
                     break
             if not updated:
-                new_lines.append(line)
+                updated_lines.append(line)
+
+        # Add any new credentials not in file
+        for key, value in credentials.items():
+            if key not in updated_keys:
+                updated_lines.append(f"{key}={value}\n")
 
         # Write back
         with open(env_path, 'w', encoding='utf-8') as f:
-            f.writelines(new_lines)
+            f.writelines(updated_lines)
 
         print_success(".env file updated")
         return True
@@ -185,70 +367,40 @@ def update_env_file(credentials):
         print_error(f"Failed to update .env: {e}")
         return False
 
-def verify_credentials():
-    """Verify credentials were saved"""
-    env_path = Path(__file__).parent / '.env'
+def verify_credentials(credentials):
+    """Verify credentials are valid"""
+    print_section("VERIFICATION")
 
-    try:
-        with open(env_path, 'r', encoding='utf-8') as f:
-            content = f.read()
+    all_valid = True
+    for key, value in credentials.items():
+        if value and not value.startswith('your_'):
+            display_value = value[:30] + '...' if len(value) > 30 else value
+            print_success(f"{key}: {display_value}")
+        else:
+            print_error(f"{key}: Empty or invalid")
+            all_valid = False
 
-        print_section("VERIFICATION")
-
-        checks = {
-            'INSTAGRAM_ACCESS_TOKEN': 'Instagram Token',
-            'INSTAGRAM_BUSINESS_ACCOUNT_ID': 'Instagram Account ID',
-            'FACEBOOK_ACCESS_TOKEN': 'Facebook Token',
-            'FACEBOOK_PAGE_ID': 'Facebook Page ID'
-        }
-
-        all_good = True
-        for key, label in checks.items():
-            for line in content.split('\n'):
-                if line.startswith(f"{key}="):
-                    value = line.split('=', 1)[1].strip()
-                    is_demo = (
-                        value.startswith('IGAB_demo') or
-                        value.startswith('EAAB_demo') or
-                        value == '17841400000000' or
-                        value == '1048264368365205'
-                    )
-
-                    if value and not is_demo:
-                        print_success(f"{label}: Configured")
-                    else:
-                        print_error(f"{label}: Still demo or empty")
-                        all_good = False
-                    break
-
-        return all_good
-
-    except Exception as e:
-        print_error(f"Verification failed: {e}")
-        return False
+    return all_valid
 
 def show_next_steps():
     """Show what to do next"""
     print_section("NEXT STEPS")
     print("""
-1. Validate credentials:
-   python validate_credentials.py
+1. Verify configuration:
+   python config.py
 
-2. Test posting to Instagram:
-   python auto_post_social.py --platform instagram
+2. Test MCP servers:
+   python test_mcp_servers.py
 
-3. Test posting to Facebook:
-   python auto_post_social.py --platform facebook
-
-4. View dashboard:
-   python social_dashboard.py
-
-5. Start orchestrator:
+3. Start orchestrator:
    python orchestrator.py
+
+4. Monitor logs:
+   tail -f Logs/YYYY-MM-DD.json
     """)
 
 def main():
-    print_header("ADD REAL INSTAGRAM & FACEBOOK CREDENTIALS")
+    print_header("ADD REAL CREDENTIALS FOR ALL PLATFORMS")
 
     print("""
 This script will help you add real production credentials.
@@ -262,20 +414,57 @@ This script will help you add real production credentials.
 
     input("\nPress Enter to continue...")
 
+    # Select platforms
+    platforms = select_platforms()
+    if not platforms:
+        print_error("No platforms selected. Setup cancelled.")
+        return False
+
     # Get credentials
+    all_credentials = {}
+
     try:
-        instagram_creds = get_instagram_credentials()
-        facebook_creds = get_facebook_credentials()
+        if 'gmail' in platforms:
+            creds = get_gmail_credentials()
+            if creds:
+                all_credentials.update(creds)
+
+        if 'linkedin' in platforms:
+            creds = get_linkedin_credentials()
+            if creds:
+                all_credentials.update(creds)
+
+        if 'instagram' in platforms:
+            creds = get_instagram_credentials()
+            if creds:
+                all_credentials.update(creds)
+
+        if 'facebook' in platforms:
+            creds = get_facebook_credentials()
+            if creds:
+                all_credentials.update(creds)
+
+        if 'twitter' in platforms:
+            creds = get_twitter_credentials()
+            if creds:
+                all_credentials.update(creds)
+
+        if 'whatsapp' in platforms:
+            show_whatsapp_guide()
+
     except KeyboardInterrupt:
-        print("\n\nSetup cancelled")
+        print("\n\nSetup cancelled by user.")
+        return False
+
+    if not all_credentials:
+        print_error("No credentials entered.")
         return False
 
     # Show summary
     print_section("SUMMARY")
-    print(f"\nInstagram Account ID: {instagram_creds['INSTAGRAM_BUSINESS_ACCOUNT_ID']}")
-    print(f"Instagram Token: {instagram_creds['INSTAGRAM_ACCESS_TOKEN'][:30]}...")
-    print(f"\nFacebook Page ID: {facebook_creds['FACEBOOK_PAGE_ID']}")
-    print(f"Facebook Token: {facebook_creds['FACEBOOK_ACCESS_TOKEN'][:30]}...")
+    for key, value in all_credentials.items():
+        display_value = value[:40] + '...' if len(value) > 40 else value
+        print(f"  {key}: {display_value}")
 
     # Confirm
     confirm = input("\n[?] Proceed with updating .env? (yes/no): ").strip().lower()
@@ -285,13 +474,11 @@ This script will help you add real production credentials.
 
     # Update .env
     print_section("UPDATING .env FILE")
-    all_creds = {**instagram_creds, **facebook_creds}
-
-    if not update_env_file(all_creds):
+    if not update_env_file(all_credentials):
         return False
 
     # Verify
-    if verify_credentials():
+    if verify_credentials(all_credentials):
         print_success("All credentials verified!")
     else:
         print_error("Some credentials may not be correct")
@@ -301,7 +488,7 @@ This script will help you add real production credentials.
 
     print_header("✓ SETUP COMPLETE")
     print("\nYour credentials have been saved to .env")
-    print("Run: python validate_credentials.py")
+    print("Run: python config.py")
 
     return True
 

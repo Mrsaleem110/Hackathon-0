@@ -1,0 +1,133 @@
+.features-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 100px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.features-container {
+  width: 100%;
+}
+
+.section-title {
+  font-size: 42px;
+  background: linear-gradient(135deg, #d4af37 0%, #f0e68c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 60px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  padding-bottom: 25px;
+  font-weight: 900;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #d4af37, transparent);
+  border-radius: 2px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 35px;
+}
+
+.feature-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d2d44 100%);
+  border-left: 5px solid #d4af37;
+  border-radius: 16px;
+  padding: 40px;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+  transition: right 0.5s ease;
+}
+
+.feature-card:hover {
+  transform: translateX(12px);
+  box-shadow: 0 16px 45px rgba(212, 175, 55, 0.25);
+  border-left-color: #f0e68c;
+}
+
+.feature-card:hover::before {
+  right: 0;
+}
+
+.feature-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: scale(1.15);
+}
+
+.feature-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #d4af37;
+  margin-bottom: 15px;
+  letter-spacing: 0.5px;
+}
+
+.feature-description {
+  font-size: 15px;
+  color: #b0b0b0;
+  line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+  .features-section {
+    padding: 80px 20px;
+  }
+
+  .section-title {
+    font-size: 32px;
+    margin-bottom: 50px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .feature-card {
+    padding: 30px;
+  }
+
+  .feature-icon {
+    font-size: 40px;
+  }
+
+  .feature-title {
+    font-size: 18px;
+  }
+
+  .feature-description {
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,120 @@
+.platforms-section {
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 100px 40px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(212, 175, 55, 0.03) 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  position: relative;
+  z-index: 1;
+}
+
+.platforms-container {
+  width: 100%;
+}
+
+.platforms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+.platform-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d2d44 100%);
+  border: 2px solid #d4af37;
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.platform-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.platform-card:hover::before {
+  opacity: 1;
+}
+
+.platform-card:hover {
+  transform: scale(1.1) translateY(-8px);
+  box-shadow: 0 16px 45px rgba(212, 175, 55, 0.3);
+  border-color: #f0e68c;
+}
+
+.platform-icon {
+  font-size: 56px;
+  margin-bottom: 15px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.platform-card:hover .platform-icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.platform-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: #d4af37;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.platform-status {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 8px;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.platform-status.active {
+  color: #90ee90;
+  background: rgba(144, 238, 144, 0.2);
+  border: 1px solid #90ee90;
+}
+
+.platform-status.ready {
+  color: #87ceeb;
+  background: rgba(135, 206, 235, 0.2);
+  border: 1px solid #87ceeb;
+}
+
+@media (max-width: 768px) {
+  .platforms-section {
+    padding: 80px 20px;
+    margin: 40px auto;
+  }
+
+  .platforms-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .platform-card {
+    padding: 25px;
+  }
+
+  .platform-icon {
+    font-size: 44px;
+  }
+
+  .platform-name {
+    font-size: 16px;
+  }
+}

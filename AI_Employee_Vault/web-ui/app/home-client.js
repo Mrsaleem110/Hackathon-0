@@ -7,6 +7,7 @@ import Stats from './components/Stats'
 import Features from './components/Features'
 import Platforms from './components/Platforms'
 import Metrics from './components/Metrics'
+import CommandCenter from './components/CommandCenter'
 import Actions from './components/Actions'
 import Footer from './components/Footer'
 import './page.css'
@@ -50,8 +51,10 @@ export default function HomeClient() {
       <Features />
       <Platforms />
       <Metrics />
+      <CommandCenter />
       <Actions />
       <Footer />
     </main>
   )
 }
+

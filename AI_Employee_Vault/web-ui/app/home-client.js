@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Header from './components/Header'
 import Hero from './components/Hero'
 import Stats from './components/Stats'
@@ -12,7 +12,7 @@ import Actions from './components/Actions'
 import Footer from './components/Footer'
 import './page.css'
 
-export default function HomeClient() {
+function HomeContent() {
   const [stats, setStats] = useState({
     platforms: 6,
     actions: 247,
@@ -23,7 +23,6 @@ export default function HomeClient() {
 
   useEffect(() => {
     setMounted(true)
-    // Fetch real stats from API if available
     const fetchStats = async () => {
       try {
         const response = await fetch('/api/stats')
@@ -55,6 +54,14 @@ export default function HomeClient() {
       <Actions />
       <Footer />
     </main>
+  )
+}
+
+export default function HomeClient() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   )
 }
 
